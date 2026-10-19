@@ -21,15 +21,15 @@
 
 ## Структура репозитория:
 - `/docs` — документация для предзащиты и отчеты по безопасности
-- `/src/client` — клиентская часть (Frontend)
-- `/cmd/api` — точка входа API-сервера
-- `/internal/config` — загрузка и проверка конфигурации
-- `/internal/domain` — доменные модели и типы
-- `/internal/service` — бизнес-правила и прикладные сценарии
-- `/internal/repository` — доступ к данным
-- `/internal/transport/http` — HTTP-обработчики на стандартной библиотеке Go
-- `/migrations` — миграции базы данных
-- `/tests/integration` — интеграционные тесты
+- `/frontend` — клиентская часть на React, TypeScript и Vite
+- `/backend/cmd/api` — точка входа API-сервера
+- `/backend/internal/config` — загрузка и проверка конфигурации
+- `/backend/internal/domain` — доменные модели и типы
+- `/backend/internal/service` — бизнес-правила и прикладные сценарии
+- `/backend/internal/repository` — доступ к данным
+- `/backend/internal/transport/http` — HTTP-обработчики на стандартной библиотеке Go
+- `/backend/migrations` — миграции базы данных
+- `/backend/tests/integration` — интеграционные тесты
 
 ## План разработки backend
 
@@ -41,3 +41,13 @@
 6. Качество и запуск: аудит действий, тесты, проверка OWASP-рисков, Docker и документация API.
 
 На текущем этапе добавлены только черновые доменные модели. API, база данных и бизнес-логика ещё не реализованы.
+
+## Запуск frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend собран на React, TypeScript и Vite. Стартовый экран является временной основой для будущих сценариев родителя, специалиста и администратора.
