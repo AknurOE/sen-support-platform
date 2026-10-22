@@ -89,7 +89,7 @@ Every FR/NFR in this SRS is mapped to at least one role and scenario.
 | NFR-04 | Parent, Specialist, Admin | SC-01–SC-07 |
 | NFR-05 | Parent, Specialist | SC-01–SC-06 |
 | NFR-06 | Parent, Specialist, Admin | SC-01–SC-07 |
-| NFR-07 | Admin | SC-01–SC-07 |
+| NFR-07 | Parent, Specialist, Admin | SC-01–SC-07 |
 
 ## 6. Assumptions and open decisions
 
