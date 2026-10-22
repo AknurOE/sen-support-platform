@@ -1,0 +1,14 @@
+flowchart LR
+  Guardian[Parent / guardian]
+  Specialist[Assigned specialist]
+  Admin[Platform administrator]
+  Supervisor[Supervisor / committee]
+  Platform[SEN Support Platform\nWeb UI + HTTP API]
+  DB[(Relational database)]
+  Mail[Email service\noptional / future]
+  Guardian -->|Profile, sessions, diary| Platform
+  Specialist -->|Assigned sessions and diary| Platform
+  Admin -->|Accounts and assignments| Platform
+  Platform -->|Authorized read/write| DB
+  Platform -.->|Future notifications| Mail
+  Supervisor -.->|Reviews artefacts| Platform
