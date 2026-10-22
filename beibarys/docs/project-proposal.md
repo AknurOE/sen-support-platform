@@ -63,7 +63,7 @@ The engineering challenge is not a static information site: multiple roles share
 
 ## Related materials
 
-- [Functional and quality requirements](requirements.md)
+- [Software requirements specification](../../docs/srs.md)
 - [Architecture and diagrams](architecture.md)
 - [Evidence of relevance](evidence-of-relevance.md)
 - [Literature review](literature-review.md)
