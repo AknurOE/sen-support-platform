@@ -1,0 +1,29 @@
+flowchart LR
+  Parent[Parent / guardian]
+  Specialist[Assigned specialist]
+  Admin[Administrator]
+  subgraph SSP[SEN Support Platform]
+    SignIn((Sign in))
+    Profile((View linked child profile))
+    Sessions((Plan / update session))
+    Diary((Create diary entry))
+    Visibility((Set entry visibility))
+    History((Review permitted history))
+    Assignment((Manage specialist assignment))
+    Audit((Review audit metadata))
+  end
+  Parent --- SignIn
+  Parent --- Profile
+  Parent --- Sessions
+  Parent --- Diary
+  Parent --- Visibility
+  Parent --- History
+  Specialist --- SignIn
+  Specialist --- Profile
+  Specialist --- Sessions
+  Specialist --- Diary
+  Specialist --- Visibility
+  Specialist --- History
+  Admin --- SignIn
+  Admin --- Assignment
+  Admin --- Audit
