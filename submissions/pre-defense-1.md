@@ -9,6 +9,7 @@
 - Literature review and comparisons of existing systems and technologies.
 - Architecture, access-control, privacy, threat-model, and verification documentation.
 - Interactive frontend prototype with sample data.
+- Supervisor review with decisions for each comment (SF-01…SF-12).
 
 ## Current limitations
 
@@ -16,4 +17,4 @@
 - The survey has seven responses and its recruitment method is not recorded in the available materials.
 - Usability evaluation has not been conducted.
 - Consent, legal classification, retention, and hosting decisions remain open.
-- Supervisor feedback has not yet been recorded.
+- Supervisor feedback (23 Oct 2026) is recorded in `docs/supervisor-feedback.md`; most items are planned for stage 2.
