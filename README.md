@@ -54,7 +54,7 @@ Full objectives and success criteria: [docs/proposal.md](docs/proposal.md).
 | REST API contract | Draft in [`docs/openapi.yaml`](docs/openapi.yaml) |
 | Backend API, persistence, authentication, backend tests | **Not implemented** |
 | Usability study | **Not conducted** (plan: [docs/frontend/usability-plan.md](docs/frontend/usability-plan.md)) |
-| Supervisor feedback | Review requested; actual comments are logged in [docs/supervisor-feedback.md](docs/supervisor-feedback.md) only after they are received |
+| Supervisor feedback | Received 23 Oct 2026: 12 comments with decisions and owners in [docs/supervisor-feedback.md](docs/supervisor-feedback.md); recommended for Pre-Defense 1 |
 | Legal classification, consent model, retention, hosting | Open decisions ([legal checklist](docs/kazakhstan-privacy-legal-checklist.md)) |
 
 ## User research and its limits
@@ -170,12 +170,11 @@ Shared: literature review, system comparison, README and consistency review. Mil
 
 - No backend API, database integration or backend tests.
 - Survey evidence is exploratory (7 responses, self-selected); no interviews or usability study yet.
-- Supervisor feedback is not yet recorded.
 - Consent, legal classification, retention and hosting are unresolved.
 
 **Next steps** (tracked in [YouTrack](https://honchikon1.youtrack.cloud/projects/SSP))
 
-1. Collect and record supervisor feedback; apply it to the documents.
+1. Apply the supervisor feedback (SF-01…SF-12): interviews, literature update, reviewed PRs, legal checklist.
 2. Agree the API contract and the session/token design.
 3. Implement the *Access and Profiles* backend (registration/login, tokens, RBAC) with auth, RBAC and IDOR tests.
 4. Implement *Support and Diary* (sessions, visibility-controlled diary, audit/edit history).
