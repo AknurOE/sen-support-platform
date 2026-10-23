@@ -1,0 +1,65 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Guest
+actor Parent
+actor Specialist
+actor Admin
+
+rectangle "SEN Support Platform" {
+  usecase "SC-01\nRegister, sign in, and establish session" as SC01
+  usecase "SC-02\nView or update linked child profile" as SC02
+  usecase "SC-03\nPlan, view, update, or cancel support session" as SC03
+  usecase "SC-04\nCreate and read diary entries" as SC04
+  usecase "SC-05\nInspect permitted diary version history" as SC05
+  usecase "SC-06\nView permitted audit events" as SC06
+  usecase "SC-07\nManage accounts and specialist assignments" as SC07
+  usecase "SC-08\nExport permitted child records" as SC08
+}
+
+Guest --> SC01
+Parent --> SC01
+Specialist --> SC01
+Admin --> SC01
+
+Parent --> SC02
+Specialist --> SC02
+Admin --> SC02
+
+Parent --> SC03
+Specialist --> SC03
+
+Parent --> SC04
+Specialist --> SC04
+
+' SC-05 has no explicit permission row in the access matrix; no actor association is inferred.
+Parent --> SC06
+Admin --> SC06
+
+Parent --> SC07
+Admin --> SC07
+
+Parent --> SC08
+
+note bottom of SC01
+Guest access is limited to registration, sign-in,
+and public pages. Public pages are included in SC-01.
+end note
+
+note bottom of SC02
+Admin can view child profile metadata only.
+Parent and Specialist require a valid child relationship.
+end note
+
+note bottom of SC07
+Parent association is limited to specialist assignments
+as primary guardian; it does not include account management.
+Pending confirmation.
+end note
+
+note bottom of SC08
+Parent export requires a linked child and primary guardian rights;
+only permitted records are exported.
+end note
+@enduml

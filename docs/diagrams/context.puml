@@ -1,0 +1,22 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Guest
+actor Parent
+actor Specialist
+actor Admin
+
+rectangle "SEN Support Platform" as Platform
+database "PostgreSQL\n(candidate relational database)" as Database
+cloud "Email delivery service\n(optional; future, not in MVP)" as Email
+
+Guest --> Platform : browse public pages
+Guest --> Platform : register / sign in
+Parent --> Platform : manage linked child support
+Specialist --> Platform : support assigned children
+Admin --> Platform : manage accounts and assignments
+
+Platform --> Database : read and persist records
+Platform ..> Email : send future account notifications
+@enduml
