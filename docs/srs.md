@@ -93,10 +93,10 @@ Every FR/NFR in this SRS is mapped to at least one role and scenario.
 
 ## 6. Assumptions and open decisions
 
-- Guest is present in the access matrix, so SC-01 includes Guest only for public access, registration and login; Guest has no child-data access. The proposal's target-user list does not identify Guest as a target user. Confirm whether Guest is an actor in product diagrams or only an unauthenticated state.
+- Guest is present in the access matrix and the proposal, so SC-01 includes Guest only for public access, registration and login; Guest has no child-data access. Include Guest in diagrams only for those minimal interactions.
 - Role labels above preserve the access matrix exactly. The proposal uses “Parent or legal guardian” and `requirements.md` uses “Parent/guardian”; these are descriptive variations, not replacement role names.
 - The access matrix allows a Specialist to view child profiles only within a relationship and allows Admin profile metadata only. Profile scenarios do not grant broader permissions.
-- Performance, availability and usability values are proposed targets, not validated commitments. Availability and usability thresholds have no source target in the repository.
+- Performance, availability and usability values are proposed targets, not validated commitments. Ask the supervisor to confirm the proposed availability target (99% during a scheduled five-day evaluation window) and usability target (4 of 5 participants finish each agreed task within 3 minutes), along with the performance targets, at pre-defense.
 - No interviews, user findings, supervisor approval, legal review, GDPR compliance or Kazakhstan-law compliance are claimed. Local user needs and legal classification remain open in the proposal and Aknur's documents.
 - Priorities in this SRS are product priorities. The security/privacy source has its own M/S/C priorities; those remain authoritative for the referenced IDs.
 
