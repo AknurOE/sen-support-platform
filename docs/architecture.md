@@ -1,7 +1,7 @@
 # Architecture and Diagram Set (Draft)
 
 **Status:** Draft for pre-defense 1; diagrams are editable Mermaid source.  
-**Consistency rule:** Names and role semantics must match `requirements.md`, `rbac-and-threat-model.md`, and the eventual API contract.
+**Consistency rule:** The Mermaid blocks in this document and the linked `.mmd` files are the canonical diagrams. Keep them synchronized and follow the requirements and threat model. Exports in `docs/diagrams/` (SVG/PNG) are generated from these diagrams; if they differ, Mermaid is authoritative. Refresh or remove them after the canonical diagrams are reviewed.
 
 ## Architecture summary
 
@@ -49,6 +49,7 @@ flowchart LR
   Parent --- UC4
   Parent --- UC5
   Parent --- UC6
+  Parent -. "primary guardian only" .- UC7
   Specialist --- UC1
   Specialist --- UC2
   Specialist --- UC3
@@ -174,11 +175,6 @@ erDiagram
 
 The diagram is a conceptual draft; exact columns, constraints, consent records, retention, and migrations need review after the API contract and legal questions are resolved. Diary content is intentionally omitted from audit events.
 
-## Editable diagram sources
+## Diagram files
 
-- [Context](diagrams/context.mmd)
-- [Use cases](diagrams/use-cases.mmd)
-- [Components](diagrams/components.mmd)
-- [ER model](diagrams/er-model.mmd)
-
-Mermaid blocks above render in GitHub Markdown. SVG/PNG exports can be added after the supervisor confirms the notation and model.
+The four diagrams above are authored here as Mermaid. The distinct data-flow diagram is maintained in [`diagrams/dfd.mmd`](diagrams/dfd.mmd). Existing SVG and PNG renderings are grouped under [`diagrams/exports/`](diagrams/exports/) and are not editable sources of truth. Regenerate or replace those exports from the reviewed Mermaid diagrams when they are updated.

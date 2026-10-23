@@ -2,7 +2,7 @@
 
 **Owner:** Zhuparbai Yerkebulan — Frontend and UX  
 **Task:** SSP-34  
-**Status:** Desk-review scope; product table and sources are in [existing-system-comparison.md](existing-system-comparison.md).
+**Status:** Desk-review scope; product table and sources are in [existing-system-comparison.md](existing-systems-comparison.md).
 
 ## Selected systems
 
@@ -19,7 +19,7 @@ The comparison uses four adjacent products: Birdhouse for Autism, Autism Tracker
 | C7 | Export/reporting | Can users view summaries or export/share records? |
 | C8 | Web/cross-device access | Which platforms or devices are documented? |
 
-Security and privacy criteria C5, C6, C9 and C10 are defined separately in [system-security-criteria.md](system-security-criteria.md). The evidence table applies the combined criteria consistently; product-specific evidence and limitations are recorded in [existing-system-comparison.md](existing-system-comparison.md).
+Security and privacy criteria C5, C6, C9 and C10 are defined separately in [system-security-criteria.md](system-security-criteria.md). The evidence table applies the combined criteria consistently; product-specific evidence and limitations are recorded in [existing-system-comparison.md](existing-systems-comparison.md).
 
 ## Evidence rule
 

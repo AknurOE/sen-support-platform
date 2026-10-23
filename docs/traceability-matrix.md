@@ -6,6 +6,8 @@
 
 Links each requirement in [security-privacy-requirements.md](security-privacy-requirements.md) to the threats it mitigates ([rbac-and-threat-model.md](rbac-and-threat-model.md)), the planned test ([verification-plan.md](verification-plan.md)), the implementing owner and the milestone. Update the **Status** column in every pull request that touches a requirement.
 
+The authorization matrix test is planned in the [verification plan](verification-plan.md). No Go authorization test file exists yet, and no test status is changed to `Verified`.
+
 ## 1. Legend
 
 - **Test level:** U = unit, I = integration, M = access-matrix test, S = security (OWASP, ZAP, scripts), L = load, F = frontend, CI = CI check, R = review of configuration or documents.

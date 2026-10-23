@@ -1,6 +1,6 @@
 # UX Scenarios and Prototype
 
-This document records the UX scenarios and review criteria. The clickable prototype implementation is a separate frontend change and is not included in this documentation bundle.
+This document records the UX scenarios and review criteria. The consent control and withdrawal behavior are illustrative prototype interactions only; the lawful basis, guardian authority, consent wording, retention, and withdrawal workflow remain subject to supervisor/legal review. Do not treat the demo as evidence of valid consent. The clickable prototype is in [`/frontend`](../frontend). From the repository root, run `cd frontend`, `npm ci`, then `npm run dev`. Screenshot capture is deferred; no hosted demo is available yet.
 
 ## Personas (working hypotheses; validate with participants)
 
@@ -25,7 +25,7 @@ These personas describe design hypotheses derived from the project scope, not co
 
 1. Select the specialist role in the prototype.
 2. Open Diary and add an observation.
-3. Choose “Only specialists.”
+3. Choose “Only specialists.” Parent-created entries are `shared` only; the private-visibility control is for specialists in this prototype.
 4. Switch to parent role and confirm that this sample entry is not shown.
 
 ### Administrator: change a specialist assignment (not implemented in this UI prototype)

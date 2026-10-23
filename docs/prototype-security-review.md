@@ -16,7 +16,7 @@
 |---|---|---|
 | Authorization | Enforce role and child relationship on every API request; hide-only UI checks do not count. Deny by default. | Table-driven backend matrix, including cross-family IDs and ended specialist assignments. |
 | Diary visibility | Filter `specialists_only` data in database/query paths, including counts, search, export and error responses. | Integration tests for each read path and guardian export. |
-| Credentials | Follow the draft in [authentication/session decisions](authentication-and-session-decisions.md); no tokens in local/session storage. | Browser storage inspection, refresh rotation/reuse tests, logout revocation and CSRF checks. |
+| Credentials | Follow the draft in [authentication/session decisions](decisions/authentication-and-session-decisions.md); no tokens in local/session storage. | Browser storage inspection, refresh rotation/reuse tests, logout revocation and CSRF checks. |
 | XSS and rendering | Render user text as text, not trusted HTML; avoid unsafe HTML APIs; define a restrictive Content Security Policy when deployed. | Code review of diary/title rendering and a stored-XSS test with harmless payloads. |
 | Network and browser policy | HTTPS, strict CORS allowlist, appropriate security headers, and safe cookie attributes if cookies are used. | Deployment/config review and header scan. |
 | Sensitive data | Minimize child data and use synthetic fixtures. Keep secrets and personal data out of logs and Git. | Data inventory review, sample log inspection and repository secret scan. |

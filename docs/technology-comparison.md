@@ -42,7 +42,7 @@ Fit to current code/team familiarity; type safety and maintainability; relationa
 - **Authentication:** Password hashing plus short-lived access token and rotated, revocable refresh token are specified in the security requirements; implementation details and secure browser token storage must be agreed before coding.
 - **Tests/evaluation:** Go unit/integration tests, frontend checks, OWASP-oriented verification, and load measurements are planned in `verification-plan.md`; none are claimed as completed in this decision record.
 
-Frontend framework alternatives and the current React/TypeScript/Vite selection are documented in [frontend-technology-comparison.md](frontend-technology-comparison.md). Authentication/session and password-hashing trade-offs are documented separately in [authentication-and-session-decisions.md](authentication-and-session-decisions.md).
+Frontend framework alternatives and the current React/TypeScript/Vite selection are documented in [frontend-technology-comparison.md](frontend/tech-comparison.md). Authentication/session and password-hashing trade-offs are documented separately in [authentication-and-session-decisions.md](decisions/authentication-and-session-decisions.md).
 
 ## Official technical references
 

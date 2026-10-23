@@ -3,7 +3,7 @@
 **Owner:** Aknur — Security, Privacy & QA  
 **Status:** Desk-review criteria, 22 October 2026
 
-This sheet makes criteria C5, C6, C9 and C10 in [the existing-system comparison](existing-system-comparison.md) explicit. It evaluates only what the cited public material documents. “Not established” must not be read as “the product does not have this control.”
+This sheet makes criteria C5, C6, C9 and C10 in [the existing-system comparison](existing-systems-comparison.md) explicit. It evaluates only what the cited public material documents. “Not established” must not be read as “the product does not have this control.”
 
 | ID | Criterion | Evidence needed to mark “Yes” | Why it matters to this project |
 |---|---|---|---|

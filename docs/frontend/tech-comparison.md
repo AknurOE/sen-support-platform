@@ -94,5 +94,5 @@ REST с описанием API в OpenAPI. GraphQL не нужен: сущнос
 | Вопрос | Решение | Статус |
 |---|---|---|
 | Формат API | REST + OpenAPI | согласуется с Жұмағали Б. |
-| Хранение токена | access-токен в памяти, refresh в HttpOnly-cookie | решено, описано в `aknur/docs/authentication-and-session-decisions.md` |
+| Хранение токена | access-токен в памяти, refresh в HttpOnly-cookie | решено, описано в `docs/authentication-and-session-decisions.md` |
 | Версии | React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4 | зафиксированы в `package-lock.json` |

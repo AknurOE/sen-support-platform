@@ -41,4 +41,4 @@ Server-side opaque sessions simplify immediate revocation and make token handlin
 - OWASP, Password Storage Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
 - OWASP, Session Management Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
 - OWASP, CSRF Prevention Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
-- Existing project requirements: [Security and privacy requirements](security-privacy-requirements.md), SEC-01–08 and SEC-22.
+- Existing project requirements: [Security and privacy requirements](../security-privacy-requirements.md), SEC-01–08 and SEC-22.
