@@ -13,7 +13,7 @@ This report accompanies [the ER model](diagrams/er.mmd) and [the component diagr
 - `ConsentRecord`, `RefreshToken`, and `LoginLockout` are planned by the data inventory/security requirements and are not current domain types. Refresh token hashes are storage-only. Lockout keys represent submitted identifier and IP without storing raw credentials; exact key derivation and limits are implementation decisions.
 - The data inventory plans `AuditEvent.SourceIP` and an attempted identifier (hashed or truncated); neither exists in the current `AuditEvent` domain struct. The model adds these as security-event fields. `actor_id` is nullable for failed authentication attempts with no known account. `child_id` is nullable for authentication events, as AUD-05 does not attach them to a child.
 - The domain `AuditEvent` has actor, action, resource, resource ID, outcome, request ID and occurrence time, and the diagram retains these. It does not store diary text. Child-linked events use the child reference for scoped audit access.
-- `version_number` is unique within an entry; the diagram's `UK` marker indicates uniqueness, with the intended database constraint `(entry_id, version_number)`. `ChildGuardian` and `ChildSpecialist` use composite primary keys.
+- `version_number` is intended to be unique within an entry, using a composite database constraint `(entry_id, version_number)`. `ChildGuardian` and `ChildSpecialist` use composite primary keys.
 - Access rules remain those in the matrix: Parent-created diary entries use `shared`; guardians never receive `specialists_only`; Admin has no diary content access; relationship absence maps to 404 and an insufficient right on an existing relationship maps to 403.
 
 ## Questions
