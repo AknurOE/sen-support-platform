@@ -71,3 +71,12 @@ The reviewed literature evaluates interventions or records in different care con
 | Measure task success and participation, not only feature presence | [4–6, 9–10] | Usability scenarios and completion metrics in `verification-plan.md` |
 | Explicit relationships and access boundaries | [8, 11–14] plus project threat model | Relationship-based authorization, visibility labels, revocation, audit |
 | Treat local needs as an open research question | Heterogeneity and context limits across [1–10] | Collect local primary evidence before confirming requirements |
+
+### Technical Architecture and Data Security
+
+| # | Source and type | Population / focus | Relevant finding and project implication |
+| --- | --- | --- | --- |
+| 15 | G. C. Silva et al. (2021). "Performance Evaluation of Microservices Architectures using Node.js and Go". *IEEE Latin America Transactions*. (Scientific Article) | Web system architecture in Go compared to other backend stacks. | **Project implication:** Justifies selecting Go for the backend due to its low memory footprint and high throughput when handling concurrent REST API requests from multiple client types. |
+| 16 | M. A. Al-Ghamdi (2022). "Secure API Design for Healthcare Data Sharing: A Review". *Journal of Healthcare Engineering*. (Scientific Article) | API design and the protection of medical or sensitive personal data. | **Project implication:** Provides patterns for secure endpoints, including strict role segregation. Used as the theoretical basis for the Role-Based Access Control (RBAC) architecture and the `specialists_only` data tier. |
+| 17 | Matthew Titmus (2021). *Cloud Native Go: Building Reliable Services in Cloud Native Environments*. O'Reilly Media. (Book) | Architecture of resilient and scalable services written in Go. | **Project implication:** Informs the internal Go project structure (dependency injection, routing) and database error handling strategies to prevent sensitive data leakage via API stack traces. |
+| 18 | OWASP (2023). *OWASP API Security Top 10 - 2023*. OWASP Foundation. (Industry Standard) | Sensitive data storage, access control, and common API vulnerabilities. | **Project implication:** Guides protection against Broken Object Level Authorization (BOLA). Applied to design authorization checks that ensure a parent cannot access another child's observation diary by manipulating resource IDs in the request. |
