@@ -23,6 +23,7 @@ Design and evaluate a web platform prototype that lets an authorized guardian an
 
 ## Target users and stakeholders
 
+- Unauthenticated visitor (Guest), who can view public pages, register, and log in, but cannot access child data.
 - Parent or legal guardian coordinating the child's support.
 - Assigned specialist (for example, teacher or therapist) contributing session and diary information within granted permissions.
 - Platform administrator, limited to account and assignment administration and not diary text by default.
