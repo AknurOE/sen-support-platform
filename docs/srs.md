@@ -20,14 +20,16 @@ Roles below use the exact names in the access matrix in [rbac-and-threat-model.m
 
 | Scenario | Description | Roles |
 |---|---|---|
-| SC-01 | Register, sign in and establish an authenticated session. | Guest, Parent, Specialist, Admin |
-| SC-02 | View and, when permitted, update a linked child profile. | Parent, Specialist, Admin |
+| SC-01 | Register, sign in, establish an authenticated session; view own account. | Guest, Parent, Specialist, Admin |
+| SC-02 | Create a child profile (Parent); view a linked child profile; edit it (primary guardian only). Admin sees metadata only. | Parent, Specialist, Admin |
 | SC-03 | Plan, view, update or cancel a support session within the actor's permissions. | Parent, Specialist |
-| SC-04 | Create and read diary entries according to role and entry visibility. | Parent, Specialist |
+| SC-04 | Create, read and edit diary entries according to role and visibility; delete own entries (Parent only). | Parent, Specialist |
 | SC-05 | Inspect an authorized diary entry's version history. | Parent, Specialist |
-| SC-06 | View permitted audit events showing who accessed a child's records. | Parent, Admin |
-| SC-07 | Manage accounts; create or end specialist assignments. | Admin, Parent (primary guardian) |
-| SC-08 | Export permitted records for a linked child. | Parent |
+| SC-06 | View permitted audit events: access events for a related child; system-wide log (Admin only). | Parent, Admin |
+| SC-07 | Manage user accounts (Admin); link guardians and create or end specialist assignments (Admin, primary-guardian Parent). | Admin, Parent (primary guardian) |
+| SC-08 | Export permitted records: full export (primary guardian), metadata-only export (Admin, on documented request, audited). | Parent (primary guardian), Admin |
+| SC-09 | Delete child data (primary guardian; Admin on documented request, audited, without displaying diary text). | Parent (primary guardian), Admin |
+
 
 ## 3. Functional requirements
 
