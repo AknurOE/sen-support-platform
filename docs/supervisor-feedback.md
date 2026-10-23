@@ -1,19 +1,23 @@
 # Supervisor Review and Feedback Log
 
-**Status:** Awaiting actual supervisor review. No feedback is recorded in the supplied materials as of 22 October 2026.
+**Status:** Awaiting supervisor feedback. The supplied materials contain no dated record that the request was sent and no supervisor response. Update this log only from a real request or response.
 
-This table is a record template, not a claim that the supervisor has reviewed or approved the current drafts. Add a row only after feedback is received. Keep the comment faithful to what was said and link the resulting change.
+This table records actual supervisor feedback only. No feedback rows are recorded yet. Keep each comment faithful to what was said and link the resulting change.
 
 | ID | Date received | Deliverable / decision reviewed | Supervisor's actual comment | Decision / response | Change made (file/commit/PR) | Status |
 |---|---|---|---|---|---|---|
-| SF-01 | Pending | Proposal, evidence, requirements, architecture | Pending review | Pending | Pending | Awaiting review |
-| SF-02 | Pending | Data classification, consent, hosting/legal assumptions | Pending review | Pending | Pending | Awaiting review |
 
 ## Review request checklist
 
-### Proposed meeting protocol (complete after the meeting)
+### Questions to raise with the supervisor
 
-1. Send the supervisor the proposal, evidence/research log, requirements, architecture and security decisions before the meeting.
+- Is the anonymous survey with seven responses sufficient as initial evidence for this pre-defense, given its small sample?
+- Is a legal consultation required before making decisions about children’s personal data, consent, retention, and hosting?
+- Which deliverables should the team prioritize before 24 October?
+
+### Review protocol
+
+1. Send the supervisor the proposal, evidence/research log, requirements, architecture and security decisions. Record the actual sent date only after sending.
 2. Ask for decisions on scope and contribution expectations, whether evidence is sufficient, child-data classification/consent, hosting/localization, auth/session design, and priority for the remaining work before 24 October.
 3. For each point, record the supervisor's actual wording or a faithful anonymized summary, date, decision, owner, due date and affected artifact in the table above.
 4. Confirm the notes with the supervisor if the department expects formal minutes. Do not mark a decision approved until it has actually been confirmed.

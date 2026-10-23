@@ -6,7 +6,7 @@
 
 ## Problem
 
-Families supporting a child with special educational needs (SEN) may coordinate appointments, share observations, and track agreed support across home, school, and specialist settings. These records can be scattered across messages, calendars, paper notes, and separate apps. This project investigates and prototypes a privacy-conscious shared workspace for those coordination tasks. The size and local relevance of this problem still need validation with intended users in Kazakhstan; the statements in this proposal are a problem hypothesis, not a result of completed local fieldwork.
+Families supporting a child with special educational needs (SEN) may coordinate appointments, share observations, and track agreed support across home, school, and specialist settings. These records can be scattered across messages, calendars, paper notes, and separate apps. This project investigates and prototypes a privacy-conscious shared workspace for those coordination tasks. An exploratory anonymous survey of three parents/guardians and four specialists in Kazakhstan was conducted on 22–23 October 2026. It provides preliminary, self-reported evidence for the coordination problems described here, but the small sample is not representative and does not establish how common those problems are. See the survey findings and limitations in [evidence-to-requirements](research/evidence-to-requirements.md).
 
 ## Aim
 
@@ -14,7 +14,7 @@ Design and evaluate a web platform prototype that lets an authorized guardian an
 
 ## Objectives
 
-1. Identify user needs and constraints through 3–5 discussions with parent/guardian and specialist representatives, or document a substantive agreement with a client.
+1. Identify initial user needs and constraints through an anonymous survey of parent/guardian and specialist representatives; document the sample, findings, assumptions, and limitations.
 2. Review relevant research and compare existing products and technical alternatives.
 3. Specify functional, quality, security, and privacy requirements with measurable acceptance criteria.
 4. Design the system context, use cases, components, data model, and principal user flows.
@@ -53,7 +53,7 @@ The engineering challenge is not a static information site: multiple roles share
 - The product is a coordination tool; diary content may reveal health/disability information. Exact legal classification, consent model, retention, and data-localisation requirements require supervisor/legal confirmation.
 - Initial prototype data will be synthetic; no real child data will be used.
 - API contract, role definitions, and relationship semantics must be agreed before implementation.
-- Local user needs are not yet evidenced in the materials reviewed; see `evidence-of-relevance.md`.
+- The exploratory survey is the project's initial user evidence. The form link was shared in WhatsApp, Telegram, and other messaging groups. The sample is small; findings must not be generalized to all families or specialists.
 
 ## Success criteria for the diploma prototype
 
@@ -64,8 +64,8 @@ The engineering challenge is not a static information site: multiple roles share
 
 ## Related materials
 
-- [Software requirements specification](../../docs/srs.md)
+- [Software requirements specification](srs.md)
 - [Architecture and diagrams](architecture.md)
-- [Evidence of relevance](evidence-of-relevance.md)
+- [Evidence of relevance](research/evidence-to-requirements.md)
 - [Literature review](literature-review.md)
 - [Verification plan](verification-plan.md)

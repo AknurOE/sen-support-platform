@@ -563,17 +563,19 @@ function DiaryScreen() {
               <Icon name="plus" size={18} />
               {t("attach")}
             </button>
-            <label className="visibility-toggle">
-              <input
-                type="checkbox"
-                checked={privateEntry}
-                onChange={(event) => setPrivateEntry(event.target.checked)}
-              />
-              <span className="fake-toggle" />
-              <span>
-                <strong>{t("specialistsOnly")}</strong>
-              </span>
-            </label>
+            {role === "specialist" && (
+              <label className="visibility-toggle">
+                <input
+                  type="checkbox"
+                  checked={privateEntry}
+                  onChange={(event) => setPrivateEntry(event.target.checked)}
+                />
+                <span className="fake-toggle" />
+                <span>
+                  <strong>{t("specialistsOnly")}</strong>
+                </span>
+              </label>
+            )}
             <button
               className="button button--primary"
               type="button"
@@ -582,7 +584,7 @@ function DiaryScreen() {
                   type,
                   title: t("savedEntry"),
                   text,
-                  visibility: privateEntry ? "specialists_only" : "shared",
+                  visibility: role === "specialist" && privateEntry ? "specialists_only" : "shared",
                 })
                 setText("")
               }}
