@@ -1,0 +1,23 @@
+flowchart TB
+  subgraph Browser
+    UI[React + TypeScript UI]
+    Client[HTTP client / DTOs]
+    UI --> Client
+  end
+  Client -->|HTTPS JSON| HTTP[Go net/http handlers]
+  subgraph API[Go API]
+    HTTP --> Auth[Authentication middleware]
+    Auth --> Access[Authorization service\nrole + relationship + visibility]
+    Access --> Profile[Profile service]
+    Access --> Session[Support session service]
+    Access --> Diary[Diary and version service]
+    Profile --> Repo[Repository interfaces]
+    Session --> Repo
+    Diary --> Repo
+    Access --> Audit[Audit service]
+    Profile --> Audit
+    Session --> Audit
+    Diary --> Audit
+    Repo --> DB[(PostgreSQL candidate)]
+    Audit --> DB
+  end

@@ -1,0 +1,106 @@
+
+erDiagram
+  USER ||--o{ CHILD_GUARDIAN : guardian_link
+  CHILD ||--o{ CHILD_GUARDIAN : guardian_links
+
+  USER ||--o{ CHILD_SPECIALIST : specialist_assignment
+  CHILD ||--o{ CHILD_SPECIALIST : specialist_assignments
+
+  CHILD ||--o{ SUPPORT_SESSION : has_sessions
+  USER ||--o{ SUPPORT_SESSION : created_by
+  USER o|--o{ SUPPORT_SESSION : assigned_to
+
+  CHILD ||--o{ DIARY_ENTRY : has_entries
+  USER ||--o{ DIARY_ENTRY : authored_by
+  DIARY_ENTRY ||--o{ DIARY_ENTRY_VERSION : has_versions
+  USER ||--o{ DIARY_ENTRY_VERSION : changed_by
+
+  USER ||--o{ REFRESH_TOKEN : owns
+
+  USER o|--o{ AUDIT_EVENT : actor
+  CHILD o|--o{ AUDIT_EVENT : subject
+
+  USER {
+    uuid id PK
+    string email UK
+    string password_hash
+    string role
+    string status
+    datetime created_at
+    datetime updated_at
+  }
+
+  CHILD {
+    uuid id PK
+    string first_name
+    string last_name
+    date birth_date
+    datetime created_at
+    datetime updated_at
+  }
+
+  CHILD_GUARDIAN {
+    uuid child_id PK, FK
+    uuid guardian_id PK, FK
+    boolean is_primary
+    datetime created_at
+  }
+
+  CHILD_SPECIALIST {
+    uuid child_id PK, FK
+    uuid specialist_id PK, FK
+    datetime started_at
+    datetime ended_at
+  }
+
+  SUPPORT_SESSION {
+    uuid id PK
+    uuid child_id FK
+    uuid created_by FK
+    uuid specialist_id FK
+    string title
+    datetime starts_at
+    datetime ends_at
+    string status
+    datetime created_at
+    datetime updated_at
+  }
+
+  DIARY_ENTRY {
+    uuid id PK
+    uuid child_id FK
+    uuid author_id FK
+    string visibility
+    text content
+    datetime created_at
+    datetime updated_at
+  }
+
+  DIARY_ENTRY_VERSION {
+    uuid id PK
+    uuid entry_id FK
+    uuid changed_by FK
+    int version_number
+    text content_snapshot
+    datetime changed_at
+  }
+
+  REFRESH_TOKEN {
+    uuid id PK
+    uuid user_id FK
+    string token_hash UK
+    datetime expires_at
+    datetime revoked_at
+  }
+
+  AUDIT_EVENT {
+    uuid id PK
+    uuid actor_id FK
+    uuid child_id FK
+    string action
+    string resource_type
+    uuid resource_id
+    string outcome
+    string request_id
+    datetime occurred_at
+  }
