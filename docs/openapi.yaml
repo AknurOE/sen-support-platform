@@ -5,19 +5,19 @@ info:
   description: >-
     Draft API contract derived from docs/srs.md, the access matrix, security/privacy
     requirements, data inventory, backend/internal/domain, and docs/diagrams/er.mmd.
-    Bearer JWT is used for authenticated API requests. Authentication credentials
-    and refresh secrets use HTTP Basic and an HttpOnly cookie so secrets are not
-    represented as resource DTO fields. A child resource without an active
+    Bearer JWT is used for authenticated API requests. Login and refresh use
+    JSON request and response bodies for their credentials and tokens. A child resource without an active
     relationship returns 404 (SEC-11); an existing relationship without the
     required permission returns 403. Invalid fields return 422. Parent diary
     writes are limited to shared; Parent reads and exports never include
     specialists_only. Admin responses never include diary content. Guest can
     only register and sign in.
 servers:
-  - url: https://api.example.invalid/v1
-    description: Placeholder base URL; deployment host is not specified in source documents.
+  - url: /api/v1
+    description: API base path; deployment host is not specified in source documents.
 tags:
   - name: auth
+  - name: users
   - name: child profile
   - name: guardian and specialist links
   - name: sessions
@@ -34,12 +34,9 @@ paths:
       description: |
         FR-01, SC-01; SEC-01, SEC-02, SEC-13, SEC-14. Guest may register only as
         Parent or an already approved Specialist; public registration cannot
-        create Admin. The email and password are HTTP Basic credentials; the
-        JSON body contains only User fields. Example request: Basic username
-        `parent@example.test`, body `{"first_name":"Aida","last_name":"S." ,"role":"parent"}`.
-        Example response (201): `{"id":"u-1","email":"parent@example.test","first_name":"Aida","last_name":"S.","role":"parent","status":"active","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}`.
-      security:
-        - basicAuth: []
+        create Admin. Example request: `{"email":"parent@example.test","password":"example-password","first_name":"Aida","last_name":"S.","role":"parent"}`.
+        Example response (201): `{"id":"00000000-0000-4000-8000-000000000001","email":"parent@example.test","first_name":"Aida","last_name":"S.","role":"parent","status":"active","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}`.
+      security: []
       requestBody:
         required: true
         content:
@@ -47,6 +44,8 @@ paths:
             schema:
               $ref: '#/components/schemas/Registration'
             example:
+              email: parent@example.test
+              password: example-password
               first_name: Aida
               last_name: S.
               role: parent
@@ -66,30 +65,28 @@ paths:
         '422':
           $ref: '#/components/responses/InvalidData'
 
-  /auth/token:
+  /auth/login:
     post:
       tags: [auth]
       summary: Sign in
       description: |
-        FR-01, SC-01; SEC-03, SEC-04, SEC-05, SEC-08, AUD-05. Basic username is
-        email; password is not included in a DTO. Success returns a short-lived
-        JWT in the Authorization response header and the refresh secret in an
-        HttpOnly, Secure cookie. Failure uses a generic response for unknown
-        email and wrong password; rate limiting may return 429. Example request:
-        Basic username `parent@example.test`. Example response (200):
-        `Authorization: Bearer eyJ...`; `Set-Cookie: refresh=...; HttpOnly; Secure`.
-      security:
-        - basicAuth: []
+        FR-01, SC-01; SEC-03, SEC-04, SEC-05, SEC-08, AUD-05. Failure uses a
+        generic response for unknown email and wrong password; rate limiting may
+        return 429. Example request: `{"email":"parent@example.test","password":"example-password"}`.
+        Example response (200): `{"access_token":"eyJ...","refresh_token":"opaque..."}`.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+            example: { email: parent@example.test, password: example-password }
       responses:
         '200':
-          description: Signed in; raw credentials and token secrets are not JSON DTOs.
-          headers:
-            Authorization:
-              description: Short-lived bearer JWT.
-              schema: { type: string }
-            Set-Cookie:
-              description: Rotating refresh token cookie; server stores only its hash.
-              schema: { type: string }
+          description: Signed in; access and refresh tokens are returned in JSON.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TokenPair' }
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -110,27 +107,23 @@ paths:
       tags: [auth]
       summary: Rotate the refresh token
       description: |
-        FR-01, SC-01; SEC-05, SEC-06, AUD-05. Send the refresh cookie; the old
-        token is rotated and cannot be reused. Example request:
-        `Cookie: refresh=opaque-secret`. Example response (200):
-        `Authorization: Bearer eyJ...`; replacement `Set-Cookie` header.
+        FR-01, SC-01; SEC-05, SEC-06, AUD-05. Send the refresh token in JSON;
+        the old token is rotated and cannot be reused. Example request:
+        `{"refresh_token":"opaque..."}`. Example response (200):
+        `{"access_token":"eyJ...","refresh_token":"replacement..."}`.
       security: []
-      parameters:
-        - name: Cookie
-          in: header
-          required: true
-          schema: { type: string }
-          example: refresh=opaque-secret
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RefreshRequest' }
+            example: { refresh_token: opaque-secret }
       responses:
         '200':
-          description: Rotated; new access JWT and refresh cookie are returned in headers.
-          headers:
-            Authorization:
-              description: Short-lived bearer JWT.
-              schema: { type: string }
-            Set-Cookie:
-              description: Replacement refresh token cookie.
-              schema: { type: string }
+          description: Rotated tokens.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TokenPair' }
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -145,22 +138,174 @@ paths:
       tags: [auth]
       summary: End the current session
       description: |
-        FR-01, SC-01; SEC-06, AUD-05. Revokes the refresh token associated with
-        the cookie. Example request: `Cookie: refresh=opaque-secret` with a
-        bearer JWT. Example response (204): no body; refresh cookie is cleared.
-      parameters:
-        - name: Cookie
-          in: header
-          required: true
-          schema: { type: string }
-          example: refresh=opaque-secret
+        FR-01, SC-01; SEC-06, AUD-05. Revokes the submitted refresh token.
+        Example request: `{"refresh_token":"opaque..."}` with a bearer JWT.
+        Example response (204): no body.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RefreshRequest' }
+            example: { refresh_token: opaque-secret }
       responses:
         '204':
-          description: Session ended; refresh cookie cleared.
-          headers:
-            Set-Cookie:
-              description: Expired refresh cookie.
-              schema: { type: string }
+          description: Session ended.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidData'
+
+  /users:
+    post:
+      tags: [users]
+      summary: Create a user account
+      description: |
+        FR-13, SC-07; SEC-10, SEC-13, SEC-14, AUD-05. Admin only. User metadata only, no diary text. Public
+        registration remains limited to Parent and approved Specialist roles;
+        this operation lets an Admin manage accounts. Example request:
+        `{"email":"specialist@example.test","password":"example-password","first_name":"Dana","last_name":"K.","role":"specialist"}`.
+        Example response (201): `{"id":"00000000-0000-4000-8000-000000000003","email":"specialist@example.test","first_name":"Dana","last_name":"K.","role":"specialist","status":"active","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AdminUserCreate' }
+            example:
+              email: specialist@example.test
+              password: example-password
+              first_name: Dana
+              last_name: K.
+              role: specialist
+      responses:
+        '201':
+          description: User account created.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidData'
+
+  /users/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      tags: [users]
+      summary: Deactivate a user account
+      description: |
+        FR-13, SC-07; SEC-08, SEC-10, AUD-05. Admin only. Sets User.status to
+        `inactive`; subsequent requests with existing tokens are rejected. Admin response is metadata only, no diary text.
+        Example request: `{"status":"inactive"}`. Example response (200):
+        `{"id":"00000000-0000-4000-8000-000000000003","email":"specialist@example.test","first_name":"Dana","last_name":"K.","role":"specialist","status":"inactive","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T11:00:00Z"}`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UserDeactivation' }
+            example: { status: inactive }
+      responses:
+        '200':
+          description: User deactivated.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidData'
+
+  /audit-events:
+    get:
+      tags: [audit]
+      summary: Read system audit events
+      description: |
+        FR-14, SC-06, SC-07; SEC-10, SEC-15, AUD-04, AUD-05. Admin only; the
+        response is metadata only, no diary text. Example request:
+        `GET /audit-events`. Example response (200):
+        `[{"id":"50000000-0000-4000-8000-000000000001","actor_id":"00000000-0000-4000-8000-000000000003","child_id":null,"action":"login","resource":"user","resource_id":"00000000-0000-4000-8000-000000000003","outcome":"success","request_id":"r-1","occurred_at":"2026-10-23T10:00:00Z"}]`.
+      responses:
+        '200':
+          description: System audit metadata only, no diary text.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AuditEventView' }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidData'
+
+  /children:
+    get:
+      tags: [child profile]
+      summary: List linked child profiles
+      description: |
+        FR-02, FR-15, SC-02; SEC-11, SEC-15. Parent and Specialist receive
+        profiles only for active relationships. Admin receives metadata only,
+        no diary text. Example request: `GET /children`. Example response (200):
+        `[{"id":"10000000-0000-4000-8000-000000000001","first_name":"Mira","last_name":"S.","birth_date":"2018-04-12","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}]`.
+      responses:
+        '200':
+          description: Linked children; for Admin, metadata only, no diary text.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Child' }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidData'
+    post:
+      tags: [child profile]
+      summary: Create a child profile
+      description: |
+        FR-02, SC-02; PRV-07, SEC-10, SEC-11, AUD-01. Parent only. A consent
+        record is created with the authenticated guardian and policy version;
+        consent time is recorded by the server. Example request:
+        `{"first_name":"Mira","last_name":"S.","birth_date":"2018-04-12","policy_version":"v1"}`.
+        Example response (201): `{"id":"10000000-0000-4000-8000-000000000001","first_name":"Mira","last_name":"S.","birth_date":"2018-04-12","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ChildRegistration' }
+            example:
+              first_name: Mira
+              last_name: S.
+              birth_date: '2018-04-12'
+              policy_version: v1
+      responses:
+        '201':
+          description: Child created with a ConsentRecord.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Child' }
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -178,10 +323,10 @@ paths:
       summary: Read child profile
       description: |
         FR-02, FR-15, SC-02; SEC-11. Parent and Specialist need an active
-        relationship; Admin receives metadata only. No relationship, including
+        relationship; Admin receives metadata only, no diary text. No relationship, including
         an ended assignment, returns 404; insufficient rights on an existing
-        relationship returns 403. Example request: `GET /children/c-1`.
-        Example response (200): `{"id":"c-1","first_name":"Mira","last_name":"S.","birth_date":"2018-04-12","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}`.
+        relationship returns 403. Example request: `GET /children/10000000-0000-4000-8000-000000000001`.
+        Example response (200): `{"id":"10000000-0000-4000-8000-000000000001","first_name":"Mira","last_name":"S.","birth_date":"2018-04-12","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}`.
       responses:
         '200':
           description: Child profile fields permitted for the caller.
@@ -204,7 +349,7 @@ paths:
         active relationship may change the profile. No relationship returns
         404; a linked non-primary Parent, Specialist or Admin returns 403.
         Example request: `{"first_name":"Mira","birth_date":"2018-04-12"}`.
-        Example response (200): `{"id":"c-1","first_name":"Mira","last_name":"S.","birth_date":"2018-04-12","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T11:00:00Z"}`.
+        Example response (200): `{"id":"10000000-0000-4000-8000-000000000001","first_name":"Mira","last_name":"S.","birth_date":"2018-04-12","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T11:00:00Z"}`.
       requestBody:
         required: true
         content:
@@ -234,16 +379,16 @@ paths:
       summary: Link a guardian
       description: |
         FR-03, SC-07; SEC-11, SEC-13, AUD-01. Primary Parent for a related
-        child or Admin may create the link. No Parent relationship returns 404;
+        child or Admin may create the link; Admin response is metadata only, no diary text. No Parent relationship returns 404;
         an existing relationship without primary rights returns 403. Example
-        request: `{"guardian_id":"u-2","relationship":"guardian","is_primary":false}`.
-        Example response (201): `{"child_id":"c-1","guardian_id":"u-2","relationship":"guardian","is_primary":false,"created_at":"2026-10-23T10:00:00Z"}`.
+        request: `{"guardian_id":"00000000-0000-4000-8000-000000000002","relationship":"guardian","is_primary":false}`.
+        Example response (201): `{"child_id":"10000000-0000-4000-8000-000000000001","guardian_id":"00000000-0000-4000-8000-000000000002","relationship":"guardian","is_primary":false,"created_at":"2026-10-23T10:00:00Z"}`.
       requestBody:
         required: true
         content:
           application/json:
             schema: { $ref: '#/components/schemas/GuardianLinkInput' }
-            example: { guardian_id: u-2, relationship: guardian, is_primary: false }
+            example: { guardian_id: 00000000-0000-4000-8000-000000000002, relationship: guardian, is_primary: false }
       responses:
         '201':
           description: Guardian link created.
@@ -267,17 +412,17 @@ paths:
       summary: Assign a specialist
       description: |
         FR-03, SC-07; SEC-11, SEC-14, AUD-01. Primary Parent for a related
-        child or Admin may assign an approved Specialist. No Parent relationship
+        child or Admin may assign an approved Specialist; Admin response is metadata only, no diary text. No Parent relationship
         returns 404; an existing relationship without primary rights returns
         403. The actor and assignment time are server-derived. Example request:
-        `{"specialist_id":"u-3"}`. Example response (201):
-        `{"child_id":"c-1","specialist_id":"u-3","assigned_by":"u-1","assigned_at":"2026-10-23T10:00:00Z","ended_at":null}`.
+        `{"specialist_id":"00000000-0000-4000-8000-000000000003"}`. Example response (201):
+        `{"child_id":"10000000-0000-4000-8000-000000000001","specialist_id":"00000000-0000-4000-8000-000000000003","assigned_by":"00000000-0000-4000-8000-000000000001","assigned_at":"2026-10-23T10:00:00Z","ended_at":null}`.
       requestBody:
         required: true
         content:
           application/json:
             schema: { $ref: '#/components/schemas/SpecialistAssignmentInput' }
-            example: { specialist_id: u-3 }
+            example: { specialist_id: 00000000-0000-4000-8000-000000000003 }
       responses:
         '201':
           description: Assignment created.
@@ -299,17 +444,17 @@ paths:
       - name: specialistId
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, format: uuid }
     patch:
       tags: [guardian and specialist links]
       summary: End a specialist assignment
       description: |
         FR-03, SC-07; SEC-11, AUD-01. Primary Parent for a related child or
-        Admin may set ended_at. Revocation is effective on the next request,
+        Admin may set ended_at; Admin response is metadata only, no diary text. Revocation is effective on the next request,
         including a request with an earlier JWT. No relationship returns 404;
         insufficient rights returns 403. Example request:
         `{"ended_at":"2026-10-23T11:00:00Z"}`. Example response (200):
-        `{"child_id":"c-1","specialist_id":"u-3","assigned_by":"u-1","assigned_at":"2026-10-23T10:00:00Z","ended_at":"2026-10-23T11:00:00Z"}`.
+        `{"child_id":"10000000-0000-4000-8000-000000000001","specialist_id":"00000000-0000-4000-8000-000000000003","assigned_by":"00000000-0000-4000-8000-000000000001","assigned_at":"2026-10-23T10:00:00Z","ended_at":"2026-10-23T11:00:00Z"}`.
       requestBody:
         required: true
         content:
@@ -341,8 +486,8 @@ paths:
         FR-04, SC-03; SEC-11, AUD-01. Parent or Specialist with an active
         relationship may read permitted fields. Admin has no individual session
         access. No relationship returns 404; a linked role without permission
-        returns 403. Example request: `GET /children/c-1/sessions`.
-        Example response (200): `[{"id":"ss-1","child_id":"c-1","specialist_id":"u-3","created_by":"u-1","title":"Weekly support","starts_at":"2026-10-24T09:00:00Z","ends_at":"2026-10-24T10:00:00Z","mode":"online","status":"scheduled","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}]`.
+        returns 403. Example request: `GET /children/10000000-0000-4000-8000-000000000001/sessions`.
+        Example response (200): `[{"id":"20000000-0000-4000-8000-000000000001","child_id":"10000000-0000-4000-8000-000000000001","specialist_id":"00000000-0000-4000-8000-000000000003","created_by":"00000000-0000-4000-8000-000000000001","title":"Weekly support","starts_at":"2026-10-24T09:00:00Z","ends_at":"2026-10-24T10:00:00Z","mode":"online","status":"scheduled","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}]`.
       responses:
         '200':
           description: Sessions permitted to the caller.
@@ -366,7 +511,7 @@ paths:
       - name: sessionId
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, format: uuid }
     patch:
       tags: [sessions]
       summary: Update or cancel a support session
@@ -376,7 +521,7 @@ paths:
         `cancelled`. Admin has no individual session access. No relationship
         returns 404; insufficient rights returns 403; invalid data returns 422.
         Example request: `{"status":"cancelled"}`. Example response (200):
-        `{"id":"ss-1","child_id":"c-1","specialist_id":"u-3","created_by":"u-1","title":"Weekly support","starts_at":"2026-10-24T09:00:00Z","ends_at":"2026-10-24T10:00:00Z","mode":"online","status":"cancelled","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T11:00:00Z"}`.
+        `{"id":"20000000-0000-4000-8000-000000000001","child_id":"10000000-0000-4000-8000-000000000001","specialist_id":"00000000-0000-4000-8000-000000000003","created_by":"00000000-0000-4000-8000-000000000001","title":"Weekly support","starts_at":"2026-10-24T09:00:00Z","ends_at":"2026-10-24T10:00:00Z","mode":"online","status":"cancelled","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T11:00:00Z"}`.
       requestBody:
         required: true
         content:
@@ -405,15 +550,15 @@ paths:
         active relationship may create a session; actor and child context are
         server-derived. No relationship returns 404; forbidden role/action
         returns 403; invalid interval, mode or status returns 422. Example
-        request: `{"specialist_id":"u-3","title":"Weekly support","starts_at":"2026-10-24T09:00:00Z","ends_at":"2026-10-24T10:00:00Z","mode":"online","status":"scheduled"}`.
-        Example response (201): `{"id":"ss-1","child_id":"c-1","specialist_id":"u-3","created_by":"u-1","title":"Weekly support","starts_at":"2026-10-24T09:00:00Z","ends_at":"2026-10-24T10:00:00Z","mode":"online","status":"scheduled","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}`.
+        request: `{"specialist_id":"00000000-0000-4000-8000-000000000003","title":"Weekly support","starts_at":"2026-10-24T09:00:00Z","ends_at":"2026-10-24T10:00:00Z","mode":"online","status":"scheduled"}`.
+        Example response (201): `{"id":"20000000-0000-4000-8000-000000000001","child_id":"10000000-0000-4000-8000-000000000001","specialist_id":"00000000-0000-4000-8000-000000000003","created_by":"00000000-0000-4000-8000-000000000001","title":"Weekly support","starts_at":"2026-10-24T09:00:00Z","ends_at":"2026-10-24T10:00:00Z","mode":"online","status":"scheduled","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}`.
       requestBody:
         required: true
         content:
           application/json:
             schema: { $ref: '#/components/schemas/SupportSessionInput' }
             example:
-              specialist_id: u-3
+              specialist_id: 00000000-0000-4000-8000-000000000003
               title: Weekly support
               starts_at: '2026-10-24T09:00:00Z'
               ends_at: '2026-10-24T10:00:00Z'
@@ -445,8 +590,8 @@ paths:
         entries only; Specialist with an active relationship may receive both
         visibility values; Admin never receives content. No relationship
         returns 404; a related actor lacking permission returns 403. Example
-        request: `GET /children/c-1/diary-entries`. Example response (200):
-        `[{"id":"d-1","child_id":"c-1","author_id":"u-1","type":"observation","visibility":"shared","content":"Joined the activity.","observed_at":"2026-10-23T09:00:00Z","created_at":"2026-10-23T09:01:00Z","updated_at":"2026-10-23T09:01:00Z"}]`.
+        request: `GET /children/10000000-0000-4000-8000-000000000001/diary-entries`. Example response (200):
+        `[{"id":"30000000-0000-4000-8000-000000000001","child_id":"10000000-0000-4000-8000-000000000001","author_id":"00000000-0000-4000-8000-000000000001","type":"observation","visibility":"shared","content":"Joined the activity.","observed_at":"2026-10-23T09:00:00Z","created_at":"2026-10-23T09:01:00Z","updated_at":"2026-10-23T09:01:00Z"}]`.
       responses:
         '200':
           description: Visibility-filtered entries; never includes Admin diary content.
@@ -473,7 +618,7 @@ paths:
         an unknown visibility/type or missing required value is invalid (422).
         No relationship returns 404. Author and child are server-derived.
         Example request: `{"type":"observation","visibility":"shared","content":"Joined the activity.","observed_at":"2026-10-23T09:00:00Z"}`.
-        Example response (201): `{"id":"d-1","child_id":"c-1","author_id":"u-1","type":"observation","visibility":"shared","content":"Joined the activity.","observed_at":"2026-10-23T09:00:00Z","created_at":"2026-10-23T09:01:00Z","updated_at":"2026-10-23T09:01:00Z"}`.
+        Example response (201): `{"id":"30000000-0000-4000-8000-000000000001","child_id":"10000000-0000-4000-8000-000000000001","author_id":"00000000-0000-4000-8000-000000000001","type":"observation","visibility":"shared","content":"Joined the activity.","observed_at":"2026-10-23T09:00:00Z","created_at":"2026-10-23T09:01:00Z","updated_at":"2026-10-23T09:01:00Z"}`.
       requestBody:
         required: true
         content:
@@ -505,7 +650,7 @@ paths:
       - name: entryId
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, format: uuid }
     put:
       tags: [diary]
       summary: Update an authored diary entry
@@ -516,7 +661,7 @@ paths:
         No relationship returns 404; a linked actor without edit rights returns
         403. Invalid data returns 422. Example request:
         `{"type":"progress","visibility":"shared","content":"Completed the task.","observed_at":"2026-10-23T09:00:00Z"}`.
-        Example response (200): `{"id":"d-1","child_id":"c-1","author_id":"u-1","type":"progress","visibility":"shared","content":"Completed the task.","observed_at":"2026-10-23T09:00:00Z","created_at":"2026-10-23T09:01:00Z","updated_at":"2026-10-23T10:00:00Z"}`; prior state appears in history.
+        Example response (200): `{"id":"30000000-0000-4000-8000-000000000001","child_id":"10000000-0000-4000-8000-000000000001","author_id":"00000000-0000-4000-8000-000000000001","type":"progress","visibility":"shared","content":"Completed the task.","observed_at":"2026-10-23T09:00:00Z","created_at":"2026-10-23T09:01:00Z","updated_at":"2026-10-23T10:00:00Z"}`; prior state appears in history.
       requestBody:
         required: true
         content:
@@ -548,17 +693,17 @@ paths:
       - name: entryId
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, format: uuid }
     get:
       tags: [diary]
       summary: Read diary entry history
       description: |
         FR-08, SC-05; SEC-11, SEC-12, SEC-15, AUD-01, AUD-03. History uses the
         same relationship, ownership and visibility rules as the current entry.
-        Parent sees shared history only; Admin never sees diary content. No
+        Parent sees versions only for shared entries; Admin never sees diary content. No
         relationship returns 404; insufficient rights returns 403. Example
-        request: `GET /children/c-1/diary-entries/d-1/versions`. Example response
-        (200): `[{"id":"dv-1","entry_id":"d-1","version_number":1,"changed_by":"u-1","type":"observation","visibility":"shared","content":"Joined the activity.","observed_at":"2026-10-23T09:00:00Z","changed_at":"2026-10-23T09:01:00Z"}]`.
+        request: `GET /children/10000000-0000-4000-8000-000000000001/diary-entries/30000000-0000-4000-8000-000000000001/versions`. Example response
+        (200): `[{"id":"40000000-0000-4000-8000-000000000001","entry_id":"30000000-0000-4000-8000-000000000001","version_number":1,"changed_by":"00000000-0000-4000-8000-000000000001","type":"observation","visibility":"shared","content":"Joined the activity.","observed_at":"2026-10-23T09:00:00Z","changed_at":"2026-10-23T09:01:00Z"}]`.
       responses:
         '200':
           description: Authorized immutable diary snapshots.
@@ -585,10 +730,10 @@ paths:
       description: |
         FR-09, FR-14, SC-06, SC-07; SEC-11, SEC-15, AUD-01, AUD-04. A related
         Parent may see access events for that child; Admin may see permitted
-        audit metadata. No Parent relationship returns 404; other insufficient
+        audit metadata only, no diary text. No Parent relationship returns 404; other insufficient
         rights return 403. Response excludes source_ip and attempted identifier
-        keys. Example request: `GET /children/c-1/audit-events`. Example response
-        (200): `[{"id":"a-1","actor_id":"u-3","child_id":"c-1","action":"read","resource":"diary_entry","resource_id":"d-1","outcome":"success","request_id":"r-1","occurred_at":"2026-10-23T10:00:00Z"}]`.
+        keys. Example request: `GET /children/10000000-0000-4000-8000-000000000001/audit-events`. Example response
+        (200): `[{"id":"50000000-0000-4000-8000-000000000001","actor_id":"00000000-0000-4000-8000-000000000003","child_id":"10000000-0000-4000-8000-000000000001","action":"read","resource":"diary_entry","resource_id":"30000000-0000-4000-8000-000000000001","outcome":"success","request_id":"r-1","occurred_at":"2026-10-23T10:00:00Z"}]`.
       responses:
         '200':
           description: Permitted audit fields only; no diary content or credential data.
@@ -616,13 +761,13 @@ paths:
         FR-12, SC-08; SEC-11, SEC-12, SEC-15, PRV-05, AUD-01. Primary Parent
         with an active relationship may export profile, sessions and `shared`
         diary entries. `specialists_only` content is excluded. Admin may not
-        request this guardian export; Admin exports are metadata-only and are
+        request this guardian export; for Admin, metadata only, no diary text; Admin exports are metadata-only and are
         outside this operation. No relationship returns 404; linked non-primary
-        Parent returns 403. Example request: `POST /children/c-1/exports` with
-        empty body. Example response (200): `[{"id":"c-1","first_name":"Mira","last_name":"S.","birth_date":"2018-04-12","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}]`; additional array items are permitted sessions and shared diary entries.
+        Parent returns 403. Example request: `POST /children/10000000-0000-4000-8000-000000000001/exports` with
+        empty body. Example response (200): `[{"id":"10000000-0000-4000-8000-000000000001","first_name":"Mira","last_name":"S.","birth_date":"2018-04-12","created_at":"2026-10-23T10:00:00Z","updated_at":"2026-10-23T10:00:00Z"}]`; additional array items are permitted sessions and shared diary entries.
       responses:
         '200':
-          description: Exported permitted records; contains no non-ER fields.
+          description: Exported permitted records as JSON; contains no non-ER fields.
           content:
             application/json:
               schema:
@@ -633,7 +778,7 @@ paths:
                     - $ref: '#/components/schemas/SupportSession'
                     - $ref: '#/components/schemas/DiaryEntry'
               example:
-                - id: c-1
+                - id: 10000000-0000-4000-8000-000000000001
                   first_name: Mira
                   last_name: S.
                   birth_date: '2018-04-12'
@@ -654,15 +799,12 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-    basicAuth:
-      type: http
-      scheme: basic
   parameters:
     ChildId:
       name: childId
       in: path
       required: true
-      schema: { type: string }
+      schema: { type: string, format: uuid }
   responses:
     Unauthorized:
       description: Missing/invalid bearer JWT or invalid credentials; generic auth failure.
@@ -692,17 +834,64 @@ components:
     Registration:
       type: object
       additionalProperties: false
-      required: [first_name, last_name, role]
+      required: [email, password, first_name, last_name, role]
       properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 10, writeOnly: true }
         first_name: { type: string }
         last_name: { type: string }
         role:
           type: string
           enum: [parent, specialist]
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, writeOnly: true }
+    RefreshRequest:
+      type: object
+      additionalProperties: false
+      required: [refresh_token]
+      properties:
+        refresh_token: { type: string }
+    TokenPair:
+      type: object
+      additionalProperties: false
+      required: [access_token, refresh_token]
+      properties:
+        access_token: { type: string }
+        refresh_token: { type: string }
+    AdminUserCreate:
+      type: object
+      additionalProperties: false
+      required: [email, password, first_name, last_name, role]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 10, writeOnly: true }
+        first_name: { type: string }
+        last_name: { type: string }
+        role: { type: string, enum: [parent, specialist, admin] }
+    UserDeactivation:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status: { type: string, enum: [inactive] }
+    ChildRegistration:
+      type: object
+      additionalProperties: false
+      required: [first_name, last_name, birth_date, policy_version]
+      properties:
+        first_name: { type: string }
+        last_name: { type: string }
+        birth_date: { type: string, format: date }
+        policy_version: { type: string }
     User:
       type: object
       properties:
-        id: { type: string }
+        id: { type: string, format: uuid }
         email: { type: string, format: email }
         first_name: { type: string }
         last_name: { type: string }
@@ -713,7 +902,7 @@ components:
     Child:
       type: object
       properties:
-        id: { type: string }
+        id: { type: string, format: uuid }
         first_name: { type: string }
         last_name: { type: string }
         birth_date: { type: string, format: date }
@@ -731,14 +920,14 @@ components:
       additionalProperties: false
       required: [guardian_id, relationship, is_primary]
       properties:
-        guardian_id: { type: string }
+        guardian_id: { type: string, format: uuid }
         relationship: { type: string, enum: [parent, guardian] }
         is_primary: { type: boolean }
     ChildGuardian:
       type: object
       properties:
-        child_id: { type: string }
-        guardian_id: { type: string }
+        child_id: { type: string, format: uuid }
+        guardian_id: { type: string, format: uuid }
         relationship: { type: string, enum: [parent, guardian] }
         is_primary: { type: boolean }
         created_at: { type: string, format: date-time }
@@ -747,13 +936,13 @@ components:
       additionalProperties: false
       required: [specialist_id]
       properties:
-        specialist_id: { type: string }
+        specialist_id: { type: string, format: uuid }
     ChildSpecialist:
       type: object
       properties:
-        child_id: { type: string }
-        specialist_id: { type: string }
-        assigned_by: { type: string }
+        child_id: { type: string, format: uuid }
+        specialist_id: { type: string, format: uuid }
+        assigned_by: { type: string, format: uuid }
         assigned_at: { type: string, format: date-time }
         ended_at: { type: string, format: date-time, nullable: true }
     AssignmentEndInput:
@@ -767,7 +956,7 @@ components:
       additionalProperties: false
       required: [specialist_id, title, starts_at, ends_at, mode, status]
       properties:
-        specialist_id: { type: string }
+        specialist_id: { type: string, format: uuid }
         title: { type: string }
         starts_at: { type: string, format: date-time }
         ends_at: { type: string, format: date-time }
@@ -776,10 +965,10 @@ components:
     SupportSession:
       type: object
       properties:
-        id: { type: string }
-        child_id: { type: string }
-        specialist_id: { type: string }
-        created_by: { type: string }
+        id: { type: string, format: uuid }
+        child_id: { type: string, format: uuid }
+        specialist_id: { type: string, format: uuid }
+        created_by: { type: string, format: uuid }
         title: { type: string }
         starts_at: { type: string, format: date-time }
         ends_at: { type: string, format: date-time }
@@ -808,9 +997,9 @@ components:
     DiaryEntry:
       type: object
       properties:
-        id: { type: string }
-        child_id: { type: string }
-        author_id: { type: string }
+        id: { type: string, format: uuid }
+        child_id: { type: string, format: uuid }
+        author_id: { type: string, format: uuid }
         type: { type: string, enum: [observation, progress, recommendation] }
         visibility: { type: string, enum: [shared, specialists_only] }
         content: { type: string }
@@ -820,10 +1009,10 @@ components:
     DiaryEntryVersion:
       type: object
       properties:
-        id: { type: string }
-        entry_id: { type: string }
+        id: { type: string, format: uuid }
+        entry_id: { type: string, format: uuid }
         version_number: { type: integer }
-        changed_by: { type: string }
+        changed_by: { type: string, format: uuid }
         type: { type: string, enum: [observation, progress, recommendation] }
         visibility: { type: string, enum: [shared, specialists_only] }
         content: { type: string }
@@ -832,12 +1021,12 @@ components:
     AuditEventView:
       type: object
       properties:
-        id: { type: string }
-        actor_id: { type: string, nullable: true }
-        child_id: { type: string, nullable: true }
+        id: { type: string, format: uuid }
+        actor_id: { type: string, format: uuid, nullable: true }
+        child_id: { type: string, format: uuid, nullable: true }
         action: { type: string }
         resource: { type: string }
-        resource_id: { type: string }
+        resource_id: { type: string, format: uuid }
         outcome: { type: string, enum: [success, denied, failure] }
         request_id: { type: string }
         occurred_at: { type: string, format: date-time }
