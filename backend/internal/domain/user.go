@@ -19,16 +19,28 @@ const (
 	UserStatusInactive UserStatus = "inactive"
 )
 
+type SpecialistApprovalStatus string
+
+const (
+	SpecialistApprovalPending  SpecialistApprovalStatus = "pending"
+	SpecialistApprovalApproved SpecialistApprovalStatus = "approved"
+	SpecialistApprovalRejected SpecialistApprovalStatus = "rejected"
+)
+
 type User struct {
-	ID           UserID
-	Email        string
-	PasswordHash string
-	FirstName    string
-	LastName     string
-	Role         Role
-	Status       UserStatus
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID                       UserID
+	Email                    string
+	PasswordHash             string `json:"-"`
+	FirstName                string
+	LastName                 string
+	Role                     Role
+	Status                   UserStatus
+	SpecialistApprovalStatus SpecialistApprovalStatus
+	FailedLoginAttempts      int
+	LoginWindowStartedAt     *time.Time
+	LockedUntil              *time.Time
+	CreatedAt                time.Time
+	UpdatedAt                time.Time
 }
 
 type SpecialistProfile struct {

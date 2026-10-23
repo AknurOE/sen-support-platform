@@ -106,6 +106,8 @@ erDiagram
   DIARY_ENTRY ||--o{ DIARY_VERSION : versioned_as
   USER ||--o{ DIARY_VERSION : changed_by
   USER ||--o{ REFRESH_TOKEN : owns
+  CHILD ||--o{ CONSENT_RECORD : has_consent
+  USER ||--o{ CONSENT_RECORD : gives_consent
   USER ||--o{ AUDIT_EVENT : actor
   CHILD ||--o{ AUDIT_EVENT : subject
 
@@ -115,6 +117,10 @@ erDiagram
     string password_hash
     string role
     string status
+    string specialist_approval_status
+    int failed_login_attempts
+    datetime login_window_started_at
+    datetime locked_until
   }
   CHILD {
     uuid id PK
@@ -133,6 +139,13 @@ erDiagram
     uuid specialist_id FK
     datetime started_at
     datetime ended_at
+  }
+  CONSENT_RECORD {
+    uuid id PK
+    uuid child_id FK
+    uuid guardian_id FK
+    string policy_version
+    datetime consented_at
   }
   SUPPORT_SESSION {
     uuid id PK
@@ -154,6 +167,10 @@ erDiagram
     uuid entry_id FK
     uuid changed_by FK
     int version_number
+    string type
+    string visibility
+    text content
+    datetime observed_at
     datetime changed_at
   }
   REFRESH_TOKEN {
@@ -161,19 +178,27 @@ erDiagram
     uuid user_id FK
     string token_hash
     datetime expires_at
+    uuid rotated_from_id FK
     datetime revoked_at
+    datetime created_at
   }
   AUDIT_EVENT {
     uuid id PK
     uuid actor_id FK
+    string attempted_identifier_hash
     uuid child_id FK
     string action
     string resource_type
+    string resource_id
+    string outcome
+    string request_id
+    inet source_ip
+    json details
     datetime occurred_at
   }
 ```
 
-The diagram is a conceptual draft; exact columns, constraints, consent records, retention, and migrations need review after the API contract and legal questions are resolved. Diary content is intentionally omitted from audit events.
+All `datetime` values are stored in UTC. The diagram is a conceptual draft; exact constraints, retention, and migrations need review after the API contract and legal questions are resolved. Diary content is intentionally omitted from audit events.
 
 ## Diagram files
 

@@ -110,19 +110,18 @@ The authorization matrix test is planned in the [verification plan](verification
 
 Every threat T1 to T18 has at least one requirement and one test. Requirements without a threat (PRV-02, 05, 06, 07, 08, AUD-04, LEG-01 to 04) are driven by privacy law and transparency, not by an attack scenario.
 
-## 4. Gaps between requirements and the current domain code
+## 4. Domain-model alignment
 
-Checked against `backend/internal/domain` in the repository archive. These items need a decision with the backend developer before the related milestone starts.
+The Go domain model and HTTP response DTOs now represent the following requirement-driven fields. Persistence constraints and service behavior remain implementation work for the backend milestone.
 
-| Requirement | Gap in code | Proposed change |
+| Requirement | Domain-model alignment |
 | --- | --- | --- |
-| AUD-01, AUD-05 | `AuditAction` has only create, read, update, delete, login | Add `export`, `logout`, `refresh`, `lockout`, `password_change`; `login` outcome `failure` already exists |
-| AUD-05 | `AuditEvent` has no source IP, and `ActorID` cannot hold an attempted email for failed logins | Add `SourceIP` and a nullable attempted-identifier field (stored as a hash or truncated, to respect PRV-04) |
-| SEC-06 | No refresh token entity | Add `RefreshToken` (hashed token, user, expiry, rotated-from, revoked-at) |
-| SEC-03 | No failed-login counter or lockout state | Add a table or in-memory limiter keyed by account and IP |
-| SEC-14 | No approval state for specialists | Add `UserStatusPending` or an approval flag |
-| PRV-07 | No consent entity | Add `ConsentRecord` (child, guardian, policy version, time) |
-| AUD-03 | `DiaryEntry` has a single `Content` and no versions | Add `DiaryEntryVersion` |
-| SEC-13, PRV-04 | `User.PasswordHash` is in the domain struct | Use separate response DTOs; never serialise the domain `User` |
-| SEC-11 | `ChildGuardian.Relationship` has parent and guardian, but "primary" is a separate flag | Keep `IsPrimary` as the only source for the primary-guardian rule |
-| PRV-02 | `SupportSession.Title` is free text and may contain health information | Treat as sensitive, escape on output (T8), consider limiting length |
+| AUD-01, AUD-05 | `AuditAction` and `AuditEvent` support authentication actions, source IP, details and a privacy-safe attempted-identifier hash. |
+| SEC-06 | `RefreshToken` contains a server-side hash, expiry, rotation lineage and revocation state. |
+| SEC-03 | `User` contains failed-login and lockout-window state. |
+| SEC-14 | `User` contains an explicit specialist approval status. |
+| PRV-07 | `ConsentRecord` contains child, guardian, policy version and consent time. |
+| AUD-03 | `DiaryEntryVersion` retains entry content and metadata per version, including actor and UTC change time. |
+| SEC-13, PRV-04 | `UserResponse` excludes `PasswordHash`; secret-bearing domain fields are marked non-serializable and are not present in response DTOs. |
+| SEC-11 | `ChildGuardian.Relationship` retains parent/guardian values; `IsPrimary` remains the source for the primary-guardian rule. |
+| PRV-02 | `SupportSession.Title` remains free text and must be treated as sensitive and escaped on output. |

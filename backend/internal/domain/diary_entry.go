@@ -30,3 +30,19 @@ type DiaryEntry struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
+
+type DiaryEntryVersionID string
+
+type DiaryEntryVersion struct {
+	ID            DiaryEntryVersionID
+	EntryID       DiaryEntryID
+	VersionNumber int
+	ChildID       ChildID
+	AuthorID      UserID
+	ChangedBy     UserID
+	Type          DiaryEntryType
+	Visibility    DiaryVisibility
+	Content       string
+	ObservedAt    time.Time
+	ChangedAt     time.Time
+}
