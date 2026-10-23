@@ -33,7 +33,8 @@ Specialist --> SC03
 Parent --> SC04
 Specialist --> SC04
 
-' SC-05 has no explicit permission row in the access matrix; no actor association is inferred.
+Parent --> SC05
+Specialist --> SC05
 Parent --> SC06
 Admin --> SC06
 
@@ -50,6 +51,10 @@ end note
 note bottom of SC02
 Admin can view child profile metadata only.
 Parent and Specialist require a valid child relationship.
+end note
+
+note bottom of SC05
+derived from diary read rows; no explicit matrix row, pending confirmation
 end note
 
 note bottom of SC07
