@@ -1,0 +1,30 @@
+@startuml
+title SEN Support Platform — component diagram
+left to right direction
+skinparam componentStyle rectangle
+
+actor "Parent / guardian" as Parent
+actor "Assigned specialist" as Specialist
+actor Administrator as Admin
+actor Guest
+
+component "Browser SPA" as SPA
+component "Go API" as API {
+  component "Transport\nHTTP handlers" as Transport
+  component "Service\nauth, access, profile,\nsessions, diary, export" as Service
+  component "Repository\ninterfaces / SQL adapters" as Repository
+  component "Audit service" as Audit
+  Transport --> Service
+  Service --> Repository
+  Service --> Audit
+}
+database "PostgreSQL" as DB
+
+Parent --> SPA : profile, sessions, diary, export
+Specialist --> SPA : assigned child workflows
+Admin --> SPA : account, assignment, audit metadata
+Guest --> SPA : registration, sign in
+SPA --> Transport : HTTPS / JSON
+Repository --> DB : domain records
+Audit --> DB : append audit events
+@enduml
