@@ -1,17 +1,25 @@
 package domain
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type AuditEventID string
 
 type AuditAction string
 
 const (
-	AuditActionCreate AuditAction = "create"
-	AuditActionRead   AuditAction = "read"
-	AuditActionUpdate AuditAction = "update"
-	AuditActionDelete AuditAction = "delete"
-	AuditActionLogin  AuditAction = "login"
+	AuditActionCreate         AuditAction = "create"
+	AuditActionRead           AuditAction = "read"
+	AuditActionUpdate         AuditAction = "update"
+	AuditActionDelete         AuditAction = "delete"
+	AuditActionExport         AuditAction = "export"
+	AuditActionLogin          AuditAction = "login"
+	AuditActionLogout         AuditAction = "logout"
+	AuditActionRefresh        AuditAction = "refresh"
+	AuditActionLockout        AuditAction = "lockout"
+	AuditActionPasswordChange AuditAction = "password_change"
 )
 
 type AuditOutcome string
@@ -23,12 +31,15 @@ const (
 )
 
 type AuditEvent struct {
-	ID         AuditEventID
-	ActorID    UserID
-	Action     AuditAction
-	Resource   string
-	ResourceID string
-	Outcome    AuditOutcome
-	RequestID  string
-	OccurredAt time.Time
+	ID                      AuditEventID
+	ActorID                 UserID
+	AttemptedIdentifierHash string
+	Action                  AuditAction
+	Resource                string
+	ResourceID              string
+	Outcome                 AuditOutcome
+	RequestID               string
+	SourceIP                string
+	Details                 json.RawMessage
+	OccurredAt              time.Time
 }

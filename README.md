@@ -68,7 +68,7 @@ The sample is small and self-selected, so the results are **preliminary and not 
 | Layer | Choice | Alternatives considered |
 |---|---|---|
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS 4 | Vue, Angular ([comparison](docs/frontend/tech-comparison.md)) |
-| Backend | Go 1.22, `net/http` | Node.js + Fastify, Python + FastAPI |
+| Backend | Go 1.23.10+, `net/http` | Node.js + Fastify, Python + FastAPI |
 | Database | PostgreSQL 16 (initial candidate; hosting not decided) | MySQL, MongoDB |
 | Client–server interaction | REST/JSON over HTTPS, contract in OpenAPI | GraphQL, gRPC |
 | Authentication | Password hashing, short-lived access token, rotated revocable refresh token (design stage) | see [decisions](docs/decisions/authentication-and-session-decisions.md) |
@@ -81,7 +81,7 @@ Justification of each decision: [docs/technology-comparison.md](docs/technology-
 ### Prerequisites
 
 - Node.js 22 and npm (the CI uses Node 22)
-- Go 1.22+ (only for the backend skeleton and `make test` / `make lint`)
+- Go 1.23.10+ (only for the backend skeleton and `make test` / `make lint`)
 - Docker (optional, only to start the local PostgreSQL container)
 
 ### Run the prototype

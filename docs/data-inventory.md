@@ -87,7 +87,7 @@ Note: the combination of name, birth date and the fact that the child is in a SE
 
 Audit events hold identifiers only, never diary text, passwords or tokens (PRV-04, AUD-05).
 
-## 2. Fields planned by the requirements (not yet in the code)
+## 2. Requirement-driven domain fields
 
 | Entity and field | Needed for | Purpose | Class | Retention (proposal) |
 | --- | --- | --- | --- | --- |
