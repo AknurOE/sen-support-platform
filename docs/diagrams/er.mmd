@@ -1,130 +1,106 @@
+
 erDiagram
-  USER ||--o| SPECIALIST_PROFILE : has
-  USER ||--o{ CHILD_GUARDIAN : linked_as_guardian
-  CHILD ||--o{ CHILD_GUARDIAN : has_guardian
-  USER ||--o{ CHILD_SPECIALIST : assigned_specialist
-  CHILD ||--o{ CHILD_SPECIALIST : has_assignment
-  USER ||--o{ SUPPORT_SESSION : creates
-  USER ||--o{ SUPPORT_SESSION : assigned_to
-  CHILD ||--o{ SUPPORT_SESSION : schedules
-  USER ||--o{ DIARY_ENTRY : authors
+  USER ||--o{ CHILD_GUARDIAN : guardian_link
+  CHILD ||--o{ CHILD_GUARDIAN : guardian_links
+
+  USER ||--o{ CHILD_SPECIALIST : specialist_assignment
+  CHILD ||--o{ CHILD_SPECIALIST : specialist_assignments
+
+  CHILD ||--o{ SUPPORT_SESSION : has_sessions
+  USER ||--o{ SUPPORT_SESSION : created_by
+  USER o|--o{ SUPPORT_SESSION : assigned_to
+
   CHILD ||--o{ DIARY_ENTRY : has_entries
+  USER ||--o{ DIARY_ENTRY : authored_by
   DIARY_ENTRY ||--o{ DIARY_ENTRY_VERSION : has_versions
   USER ||--o{ DIARY_ENTRY_VERSION : changed_by
+
   USER ||--o{ REFRESH_TOKEN : owns
-  CHILD ||--o{ CONSENT_RECORD : has_consent
-  USER ||--o{ CONSENT_RECORD : guardian_consent
+
   USER o|--o{ AUDIT_EVENT : actor
   CHILD o|--o{ AUDIT_EVENT : subject
 
   USER {
-    string id PK
+    uuid id PK
     string email UK
     string password_hash
-    string first_name
-    string last_name
     string role
     string status
     datetime created_at
     datetime updated_at
   }
-  SPECIALIST_PROFILE {
-    string user_id PK, FK
-    string specialty
-    string organization
-    string bio
-    string approval_status
-    datetime created_at
-    datetime updated_at
-  }
+
   CHILD {
-    string id PK
+    uuid id PK
     string first_name
     string last_name
     date birth_date
     datetime created_at
     datetime updated_at
   }
+
   CHILD_GUARDIAN {
-    string child_id PK, FK
-    string guardian_id PK, FK
-    string relationship
+    uuid child_id PK, FK
+    uuid guardian_id PK, FK
     boolean is_primary
     datetime created_at
   }
+
   CHILD_SPECIALIST {
-    string child_id PK, FK
-    string specialist_id PK, FK
-    string assigned_by FK
-    datetime assigned_at
+    uuid child_id PK, FK
+    uuid specialist_id PK, FK
+    datetime started_at
     datetime ended_at
   }
+
   SUPPORT_SESSION {
-    string id PK
-    string child_id FK
-    string specialist_id FK
-    string created_by FK
+    uuid id PK
+    uuid child_id FK
+    uuid created_by FK
+    uuid specialist_id FK
     string title
     datetime starts_at
     datetime ends_at
-    string mode
     string status
     datetime created_at
     datetime updated_at
   }
+
   DIARY_ENTRY {
-    string id PK
-    string child_id FK
-    string author_id FK
-    string type
+    uuid id PK
+    uuid child_id FK
+    uuid author_id FK
     string visibility
-    string content
-    datetime observed_at
+    text content
     datetime created_at
     datetime updated_at
   }
+
   DIARY_ENTRY_VERSION {
-    string id PK
-    string entry_id FK
-    int version_number UK
-    string changed_by FK
-    string type
-    string visibility
-    string content
-    datetime observed_at
+    uuid id PK
+    uuid entry_id FK
+    uuid changed_by FK
+    int version_number
+    text content_snapshot
     datetime changed_at
   }
-  CONSENT_RECORD {
-    string id PK
-    string child_id FK
-    string guardian_id FK
-    string policy_version
-    datetime consented_at
-  }
+
   REFRESH_TOKEN {
-    string id PK
-    string user_id FK
+    uuid id PK
+    uuid user_id FK
     string token_hash UK
     datetime expires_at
     datetime revoked_at
   }
-  LOGIN_LOCKOUT {
-    string identifier_key PK
-    string ip_key PK
-    int failed_attempts
-    datetime window_started_at
-    datetime locked_until
-  }
+
   AUDIT_EVENT {
-    string id PK
-    string actor_id FK
-    string child_id FK
-    string attempted_identifier_key
+    uuid id PK
+    uuid actor_id FK
+    uuid child_id FK
     string action
-    string resource
-    string resource_id
+    string resource_type
+    uuid resource_id
     string outcome
     string request_id
-    string source_ip
     datetime occurred_at
   }

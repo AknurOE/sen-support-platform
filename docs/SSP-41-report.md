@@ -1,6 +1,6 @@
 # SSP-41 — ER and component model
 
-This report accompanies [the ER model](diagrams/er.mmd) and [the component diagram](diagrams/component.puml). Source fields and permissions are taken from `backend/internal/domain`, `docs/data-inventory.md`, the access matrix, security/privacy requirements, SRS, and `beibarys/docs/architecture.md`.
+This report accompanies [the ER model](diagrams/er.mmd) and [the component diagram](diagrams/components.mmd). Source fields and permissions are taken from `backend/internal/domain`, `docs/data-inventory.md`, the access matrix, security/privacy requirements, SRS, and `beibarys/docs/architecture.md`.
 
 ## Differences and modeling decisions
 
