@@ -24,14 +24,43 @@ Shared: literature review, consolidated system comparison, README, and consisten
 
 ## Milestones
 
-| Milestone | Target | Deliverables / exit condition |
-|---|---|---|
-| Pre-defense 1 | 24 Oct 2026 | Proposal, relevance evidence, literature and system/technology comparisons, initial requirements, diagrams, prototype, verification plan, README, YouTrack tasks, actual supervisor feedback/evidence; tag `pre-defense-1` |
-| Access and Profiles backend | After pre-defense 1 | Registration/login, tokens, RBAC, profiles/links; auth, RBAC, IDOR tests |
-| Support and Diary backend | After Access and Profiles | Sessions, visibility-controlled diary, audit/edit history; visibility/audit/history tests |
-| Quality and launch | Before final stage | OWASP review, ZAP baseline, load tests, verification report, Docker/API documentation |
-| Pre-defense 2 / final | Programme dates | Working implementation and verified results; dates to confirm with programme |
+Dates after pre-defense 1 are planned targets; pre-defense 2, final pre-defense and defense dates are aligned with the official programme schedule once it is published. Each milestone closes only when its acceptance criteria are met, CI is green, PRs are reviewed and the YouTrack tasks are closed.
 
+| # | Milestone | Target | Deliverables / exit condition | Owners | Tag |
+|---|---|---|---|---|---|
+| M1 | Pre-defense 1 | 24 Oct 2026 | Proposal, relevance evidence, literature and system/technology comparisons, requirements, diagrams, prototype, verification plan, README, YouTrack tasks, supervisor feedback | All | `pre-defense-1` |
+| M2 | Foundation | 22 Nov 2026 | Go API skeleton generated from `docs/openapi.yaml`, PostgreSQL + migrations, CI test harness; 3–5 interviews (SF-02); literature extended (SF-03) | Beibarys, Erkebulan, Aknur | — |
+| M3 | Access | 20 Dec 2026 | Sign-up/login, password hashing, JWT access + rotated refresh token, rate limit, RBAC middleware; access-matrix tests in CI | Beibarys, Aknur | — |
+| M4 | Profiles · Pre-defense 2 | Late Feb 2027 | Child profiles, guardian/specialist links, assignment revocation, IDOR tests; frontend connected to auth/profiles; thesis chapters 1–3 drafted | Beibarys, Erkebulan, Aknur | `pre-defense-2` |
+| M5 | Sessions and diary | 29 Mar 2027 | Support sessions, diary visibility, versions, audit log; visibility/audit tests; usability test with 5 users (SF-08) | Beibarys, Erkebulan | — |
+| M6 | Final pre-defense | Mid-Apr 2027 | MVP complete; OWASP checks, ZAP baseline, k6 load tests, naive-baseline comparison, ASVS L1; verification report; full thesis draft | All | `final-pre-defense` |
+| M7 | Submission and defense | May–Jun 2027 | Final thesis text, anti-plagiarism check, external review, defense slides and demo | All | — |
+
+## Diploma work plan (month by month)
+
+| Work package | Owner | Start | End |
+|---|---|---|---|
+| Foundation: Go API, PostgreSQL, CI | Beibarys | 26 Oct 2026 | 22 Nov 2026 |
+| Access: auth, JWT, RBAC | Beibarys, Aknur | 23 Nov 2026 | 20 Dec 2026 |
+| Profiles and links, revocation | Beibarys, Erkebulan | 18 Jan 2027 | 19 Feb 2027 |
+| Sessions, diary, versions, audit | Beibarys, Erkebulan | 1 Mar 2027 | 29 Mar 2027 |
+| Frontend ↔ API integration | Erkebulan | 1 Dec 2026 | 29 Mar 2027 |
+| Access/IDOR tests → OWASP, k6, baseline comparison | Aknur | 23 Nov 2026 | 9 Apr 2027 |
+| 3–5 semi-structured interviews | Erkebulan, Aknur | 26 Oct 2026 | 20 Nov 2026 |
+| Usability test (5 users, SUS) | Erkebulan | 22 Mar 2027 | 5 Apr 2027 |
+
+January (winter exam session) is kept light.
+
+## Thesis writing plan
+
+| Chapter | Lead | Draft | Final |
+|---|---|---|---|
+| Introduction; Ch. 1 Literature review and existing systems | Aknur (all contribute) | 25 Dec 2026 | 23 Apr 2027 |
+| Ch. 2 Analysis, user research and requirements | Beibarys, Erkebulan | 31 Jan 2027 | 23 Apr 2027 |
+| Ch. 3 Design and architecture | Beibarys | 19 Feb 2027 | 23 Apr 2027 |
+| Ch. 4 Implementation (backend, frontend, security controls) | All | 9 Apr 2027 | 30 Apr 2027 |
+| Ch. 5 Testing and evaluation; conclusion; abstracts | Aknur (all contribute) | 23 Apr 2027 | 7 May 2027 |
+| Full text, anti-plagiarism check, external review | All | 19 Apr 2027 | 21 May 2027 |
 ## Dependencies
 
 | ID | Dependency | Reason |
